@@ -30,7 +30,7 @@ from sekai.lib.buckets import (
 )
 from sekai.lib.ease import EaseType, ease
 from sekai.lib.effect import EMPTY_EFFECT, SFX_DISTANCE, Effects, first_available_effect
-from sekai.lib.layer import LAYER_NOTE_ARROW, LAYER_NOTE_BODY, LAYER_NOTE_SLIM_BODY, LAYER_NOTE_TICK, get_z
+from sekai.lib.layer import LAYER_NOTE_ARROW, LAYER_NOTE_BODY, LAYER_NOTE_FLICK_BODY, LAYER_NOTE_SLIM_BODY, LAYER_NOTE_TICK, get_z
 from sekai.lib.layout import (
     FlickDirection,
     Layout,
@@ -403,7 +403,7 @@ def draw_note_body(kind: NoteKind, lane: float, size: float, travel: float, targ
         case NoteKind.NORM_TAP:
             _draw_regular_body(normal_note_body_sprites, lane, size, travel, target_time)
         case NoteKind.NORM_FLICK | NoteKind.NORM_HEAD_FLICK | NoteKind.NORM_TAIL_FLICK:
-            _draw_regular_body(flick_note_body_sprites, lane, size, travel, target_time)
+            _draw_flick_body(flick_note_body_sprites, lane, size, travel, target_time)
         case NoteKind.NORM_TRACE | NoteKind.NORM_HEAD_TRACE | NoteKind.NORM_TAIL_TRACE:
             _draw_slim_body(normal_trace_note_body_sprites, lane, size, travel, target_time)
         case NoteKind.NORM_TRACE_FLICK | NoteKind.NORM_HEAD_TRACE_FLICK | NoteKind.NORM_TAIL_TRACE_FLICK:
@@ -418,16 +418,19 @@ def draw_note_body(kind: NoteKind, lane: float, size: float, travel: float, targ
             _draw_regular_body(slide_note_body_sprites, lane, size, travel, target_time)
         case (
             NoteKind.CRIT_TAP
-            | NoteKind.CRIT_FLICK
             | NoteKind.CRIT_RELEASE
             | NoteKind.CRIT_HEAD_TAP
-            | NoteKind.CRIT_HEAD_FLICK
             | NoteKind.CRIT_HEAD_RELEASE
             | NoteKind.CRIT_TAIL_TAP
-            | NoteKind.CRIT_TAIL_FLICK
             | NoteKind.CRIT_TAIL_RELEASE
         ):
             _draw_regular_body(critical_note_body_sprites, lane, size, travel, target_time)
+        case (
+            NoteKind.CRIT_FLICK
+            | NoteKind.CRIT_HEAD_FLICK
+            | NoteKind.CRIT_TAIL_FLICK
+        ):
+            _draw_flick_body(critical_note_body_sprites, lane, size, travel, target_time)
         case (
             NoteKind.CRIT_TRACE
             | NoteKind.CRIT_HEAD_TRACE
@@ -539,7 +542,20 @@ def draw_note_tick(kind: NoteKind, lane: float, travel: float, target_time: floa
 
 def _draw_regular_body(sprites: BodySprites, lane: float, size: float, travel: float, target_time: float):
     a = get_alpha(target_time)
-    z = get_z(LAYER_NOTE_BODY, time=target_time, lane=lane)
+    z = get_z(LAYER_NOTE_BODY, time=target_time, lane=-abs(lane))
+    if sprites.custom_available:
+        left_layout, middle_layout, right_layout = layout_regular_note_body(lane, size, travel)
+        sprites.left.draw(left_layout, z=z, a=a)
+        sprites.middle.draw(middle_layout, z=z, a=a)
+        sprites.right.draw(right_layout, z=z, a=a)
+    else:
+        layout = layout_regular_note_body_fallback(lane, size, travel)
+        sprites.fallback.draw(layout, z=z, a=a)
+
+
+def _draw_flick_body(sprites: BodySprites, lane: float, size: float, travel: float, target_time: float):
+    a = get_alpha(target_time)
+    z = get_z(LAYER_NOTE_FLICK_BODY, time=target_time, lane=-abs(lane))
     if sprites.custom_available:
         left_layout, middle_layout, right_layout = layout_regular_note_body(lane, size, travel)
         sprites.left.draw(left_layout, z=z, a=a)
@@ -552,7 +568,7 @@ def _draw_regular_body(sprites: BodySprites, lane: float, size: float, travel: f
 
 def _draw_slim_body(sprites: BodySprites, lane: float, size: float, travel: float, target_time: float):
     a = get_alpha(target_time)
-    z = get_z(LAYER_NOTE_SLIM_BODY, time=target_time, lane=lane)
+    z = get_z(LAYER_NOTE_SLIM_BODY, time=target_time, lane=-abs(lane))
     if sprites.custom_available:
         left_layout, middle_layout, right_layout = layout_slim_note_body(lane, size, travel)
         sprites.left.draw(left_layout, z=z, a=a)
@@ -565,7 +581,7 @@ def _draw_slim_body(sprites: BodySprites, lane: float, size: float, travel: floa
 
 def _draw_tick(sprites: TickSprites, lane: float, travel: float, target_time: float):
     a = get_alpha(target_time)
-    z = get_z(LAYER_NOTE_TICK, time=target_time, lane=lane)
+    z = get_z(LAYER_NOTE_TICK, time=target_time, lane=-abs(lane))
     layout = layout_tick(lane, travel)
     if sprites.custom_available:
         sprites.normal.draw(layout, z=z, a=a)
@@ -588,7 +604,7 @@ def _draw_arrow(
             assert_never(direction)
     animation_alpha = (1 - ease_in_cubic(animation_progress)) if Options.marker_animation else 1
     a = get_alpha(target_time) * animation_alpha
-    z = get_z(LAYER_NOTE_ARROW, time=target_time, lane=lane)
+    z = get_z(LAYER_NOTE_ARROW, time=target_time, lane=-abs(lane))
     if sprites.custom_available:
         layout = layout_flick_arrow(lane, size, direction, travel, animation_progress)
         sprites.get_sprite(size, direction).draw(layout, z=z, a=a)

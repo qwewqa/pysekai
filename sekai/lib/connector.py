@@ -14,8 +14,7 @@ from sonolus.script.sprite import Sprite
 from sekai.lib.ease import EaseType, ease
 from sekai.lib.effect import Effects
 from sekai.lib.layer import (
-    LAYER_NOTE_CONNECTOR_CRITICAL,
-    LAYER_NOTE_CONNECTOR_NORMAL,
+    LAYER_NOTE_CONNECTOR,
     LAYER_NOTE_GUIDE,
     LAYER_SLOT_GLOW_EFFECT,
     get_z,
@@ -137,10 +136,11 @@ def get_guide_connector_sprites(kind: GuideConnectorKind) -> GuideSprites:
 
 def get_connector_z(kind: ConnectorKind, target_time: float, lane: float) -> float:
     match kind:
-        case ConnectorKind.ACTIVE_NORMAL | ConnectorKind.ACTIVE_FAKE_NORMAL:
-            return get_z(LAYER_NOTE_CONNECTOR_NORMAL, time=-target_time, lane=lane)
-        case ConnectorKind.ACTIVE_CRITICAL | ConnectorKind.ACTIVE_FAKE_CRITICAL:
-            return get_z(LAYER_NOTE_CONNECTOR_CRITICAL, time=-target_time, lane=lane)
+        case (ConnectorKind.ACTIVE_NORMAL
+        | ConnectorKind.ACTIVE_FAKE_NORMAL
+        | ConnectorKind.ACTIVE_CRITICAL
+        | ConnectorKind.ACTIVE_FAKE_CRITICAL):
+            return get_z(LAYER_NOTE_CONNECTOR, time=-target_time, lane=-abs(lane), etc=get_connector_z_offset(kind))
         case (
             ConnectorKind.GUIDE_NEUTRAL
             | ConnectorKind.GUIDE_RED
@@ -151,12 +151,20 @@ def get_connector_z(kind: ConnectorKind, target_time: float, lane: float) -> flo
             | ConnectorKind.GUIDE_CYAN
             | ConnectorKind.GUIDE_BLACK
         ):
-            return get_z(LAYER_NOTE_GUIDE, time=-target_time, lane=lane, etc=kind - ConnectorKind.GUIDE_NEUTRAL)
+            return get_z(LAYER_NOTE_GUIDE, time=-target_time, lane=-abs(lane), etc=kind - ConnectorKind.GUIDE_NEUTRAL)
         case ConnectorKind.NONE:
             return 0.0
         case _:
             assert_never(kind)
 
+def get_connector_z_offset(kind: ConnectorKind) -> int:
+    match kind:
+        case ConnectorKind.ACTIVE_NORMAL | ConnectorKind.ACTIVE_FAKE_NORMAL:
+            return 1
+        case ConnectorKind.ACTIVE_CRITICAL | ConnectorKind.ACTIVE_FAKE_CRITICAL:
+            return 0
+        case _:
+            assert_never(kind)
 
 def get_connector_alpha_option(kind: ConnectorKind) -> float:
     match kind:
@@ -223,6 +231,7 @@ def draw_connector(
     tail_progress: float,
     tail_target_time: float,
     segment_head_target_time: float,
+    segment_head_lane: float,
     segment_head_alpha: float,
     segment_tail_target_time: float,
     segment_tail_alpha: float,
@@ -345,7 +354,7 @@ def draw_connector(
     quality = get_connector_quality_option(kind)
     segment_count = min(max(1, ceil(quality * change_scale * CONNECTOR_QUALITY_SCALE)), quality)
 
-    z = get_connector_z(kind, head_target_time, head_lane)
+    z = get_connector_z(kind, segment_head_target_time, segment_head_lane)
 
     last_travel = start_travel
     last_lane = start_lane
@@ -509,7 +518,7 @@ def draw_connector_slot_glow_effect(
             assert_never(kind)
     height = (3.25 + (cos((time() - start_time) * 8 * pi) + 1) / 2) / 4.25
     layout = layout_slot_glow_effect(lane, size, height)
-    z = get_z(LAYER_SLOT_GLOW_EFFECT, -start_time, lane)
+    z = get_z(LAYER_SLOT_GLOW_EFFECT, -start_time, -abs(lane))
     a = remap_clamped(start_time, start_time + 0.25, 0.0, 0.3, time())
     sprite.draw(layout, z=z, a=a)
 

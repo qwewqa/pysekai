@@ -104,6 +104,7 @@ class WatchConnector(WatchArchetype):
                 tail_progress=tail.progress,
                 tail_target_time=tail.target_time,
                 segment_head_target_time=segment_head.target_time,
+                segment_head_lane=segment_head.lane,
                 segment_head_alpha=segment_head.segment_alpha,
                 segment_tail_target_time=segment_tail.target_time,
                 segment_tail_alpha=segment_tail.segment_alpha,
