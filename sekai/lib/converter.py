@@ -232,14 +232,14 @@ def convert_notes(
         connector = Connector(
             head_ref=notes_by_original_index[entity.data["head"]].ref(),
             tail_ref=notes_by_original_index[entity.data["tail"]].ref(),
-            segment_head_ref=notes_by_original_index[entity.data["head"]].ref(),
-            segment_tail_ref=notes_by_original_index[entity.data["tail"]].ref(),
+            segment_head_ref=notes_by_original_index[entity.data["start"]].ref(),
+            segment_tail_ref=notes_by_original_index[entity.data["end"]].ref(),
             active_head_ref=notes_by_original_index[entity.data["start"]].ref(),
             active_tail_ref=notes_by_original_index[entity.data["end"]].ref(),
         )
         head = notes_by_original_index[entity.data["head"]]
         tail = notes_by_original_index[entity.data["tail"]]
-        segment_head = notes_by_original_index[entity.data["head"]]
+        segment_head = notes_by_original_index[entity.data["start"]]
         head.connector_ease = ease_type_mapping[entity.data["ease"]]
         connector_kind = active_connector_kind_mapping[entity.archetype]
         head.segment_kind = connector_kind
