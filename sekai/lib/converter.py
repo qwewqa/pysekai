@@ -261,7 +261,7 @@ def convert_notes(
         slide_index = entity.data.get("slide", -1)
         if slide_index > 0:
             slide_connector = connectors_by_original_index[slide_index]
-            note.active_head_ref = slide_connector.head_ref
+            note.active_head_ref = slide_connector.active_head_ref
     for entity in data.iter_by_archetype("SimLine"):
         sim_line = SimLine(
             left_ref=notes_by_original_index[entity.data["a"]].ref(),
