@@ -19,4 +19,4 @@ LAYER_SLOT_GLOW_EFFECT = 30
 
 
 def get_z(layer: int, time: float = 0.0, lane: float = 0.0, etc: int | float = 0.0) -> float:
-    return (1 / 128) * etc - (1 / 128) * lane - time + 512 * layer
+    return (1 / 128) * etc + (1 / 128) * abs(lane) - time + 512 * layer
