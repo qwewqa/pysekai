@@ -157,7 +157,7 @@ def get_connector_z(kind: ConnectorKind, target_time: float, lane: float) -> flo
         case _:
             assert_never(kind)
 
-def get_connector_z_offset(kind: ConnectorKind) -> int:
+def get_connector_z_offset(kind: ActiveConnectorKind) -> int:
     match kind:
         case ConnectorKind.ACTIVE_NORMAL | ConnectorKind.ACTIVE_FAKE_NORMAL:
             return 1
