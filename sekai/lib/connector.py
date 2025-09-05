@@ -14,7 +14,7 @@ from sonolus.script.sprite import Sprite
 from sekai.lib.ease import EaseType, ease
 from sekai.lib.effect import Effects
 from sekai.lib.layer import (
-    LAYER_NOTE_CONNECTOR,
+    LAYER_ACTIVE_SIDE_CONNECTOR,
     LAYER_NOTE_GUIDE,
     LAYER_SLOT_GLOW_EFFECT,
     get_z,
@@ -136,11 +136,15 @@ def get_guide_connector_sprites(kind: GuideConnectorKind) -> GuideSprites:
 
 def get_connector_z(kind: ConnectorKind, target_time: float, lane: float) -> float:
     match kind:
-        case (ConnectorKind.ACTIVE_NORMAL
-        | ConnectorKind.ACTIVE_FAKE_NORMAL
-        | ConnectorKind.ACTIVE_CRITICAL
-        | ConnectorKind.ACTIVE_FAKE_CRITICAL):
-            return get_z(LAYER_NOTE_CONNECTOR, time=-target_time, lane=lane, etc=get_connector_z_offset(kind))
+        case (
+            ConnectorKind.ACTIVE_NORMAL
+            | ConnectorKind.ACTIVE_FAKE_NORMAL
+            | ConnectorKind.ACTIVE_CRITICAL
+            | ConnectorKind.ACTIVE_FAKE_CRITICAL
+        ):
+            return get_z(
+                LAYER_ACTIVE_SIDE_CONNECTOR, time=-target_time, lane=lane, etc=get_active_connector_z_offset(kind)
+            )
         case (
             ConnectorKind.GUIDE_NEUTRAL
             | ConnectorKind.GUIDE_RED
@@ -157,7 +161,8 @@ def get_connector_z(kind: ConnectorKind, target_time: float, lane: float) -> flo
         case _:
             assert_never(kind)
 
-def get_connector_z_offset(kind: ActiveConnectorKind) -> int:
+
+def get_active_connector_z_offset(kind: ActiveConnectorKind) -> int:
     match kind:
         case ConnectorKind.ACTIVE_NORMAL | ConnectorKind.ACTIVE_FAKE_NORMAL:
             return 1
@@ -165,6 +170,7 @@ def get_connector_z_offset(kind: ActiveConnectorKind) -> int:
             return 0
         case _:
             assert_never(kind)
+
 
 def get_connector_alpha_option(kind: ConnectorKind) -> float:
     match kind:

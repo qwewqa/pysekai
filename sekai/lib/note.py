@@ -30,7 +30,14 @@ from sekai.lib.buckets import (
 )
 from sekai.lib.ease import EaseType, ease
 from sekai.lib.effect import EMPTY_EFFECT, SFX_DISTANCE, Effects, first_available_effect
-from sekai.lib.layer import LAYER_NOTE_ARROW, LAYER_NOTE_BODY, LAYER_NOTE_FLICK_BODY, LAYER_NOTE_SLIM_BODY, LAYER_NOTE_TICK, get_z
+from sekai.lib.layer import (
+    LAYER_NOTE_ARROW,
+    LAYER_NOTE_BODY,
+    LAYER_NOTE_FLICK_BODY,
+    LAYER_NOTE_SLIM_BODY,
+    LAYER_NOTE_TICK,
+    get_z,
+)
 from sekai.lib.layout import (
     FlickDirection,
     Layout,
@@ -425,11 +432,7 @@ def draw_note_body(kind: NoteKind, lane: float, size: float, travel: float, targ
             | NoteKind.CRIT_TAIL_RELEASE
         ):
             _draw_regular_body(critical_note_body_sprites, lane, size, travel, target_time)
-        case (
-            NoteKind.CRIT_FLICK
-            | NoteKind.CRIT_HEAD_FLICK
-            | NoteKind.CRIT_TAIL_FLICK
-        ):
+        case NoteKind.CRIT_FLICK | NoteKind.CRIT_HEAD_FLICK | NoteKind.CRIT_TAIL_FLICK:
             _draw_flick_body(critical_note_body_sprites, lane, size, travel, target_time)
         case (
             NoteKind.CRIT_TRACE
