@@ -680,6 +680,8 @@ def get_note_effect(kind: NoteKind, judgment: Judgment):
             | NoteKind.NORM_HEAD_RELEASE
             | NoteKind.NORM_TAIL_TAP
             | NoteKind.NORM_TAIL_RELEASE
+            | NoteKind.CRIT_HEAD_TAP
+            | NoteKind.CRIT_HEAD_RELEASE
         ):
             match judgment:
                 case Judgment.PERFECT:
@@ -724,8 +726,6 @@ def get_note_effect(kind: NoteKind, judgment: Judgment):
         case (
             NoteKind.CRIT_TAP
             | NoteKind.CRIT_RELEASE
-            | NoteKind.CRIT_HEAD_TAP
-            | NoteKind.CRIT_HEAD_RELEASE
             | NoteKind.CRIT_TAIL_TAP
             | NoteKind.CRIT_TAIL_RELEASE
         ):
