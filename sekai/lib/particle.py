@@ -106,8 +106,8 @@ flick_note_particles = NoteParticleSet(
     directional=Particles.flick_note_directional,
     linear_fallback=EMPTY_PARTICLE,
     tick=EMPTY_PARTICLE,
-    lane=Particles.normal_flick_note_lane_linear,
-    lane_basic=Particles.lane,
+    lane=EMPTY_PARTICLE,
+    lane_basic=EMPTY_PARTICLE,
     slot_linear=Particles.flick_note_slot_linear,
 )
 trace_note_particles = NoteParticleSet(
