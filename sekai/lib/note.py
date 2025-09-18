@@ -925,7 +925,7 @@ def play_note_hit_effects(kind: NoteKind, lane: float, size: float, direction: F
         if particles.lane.is_available:
             particles.lane.spawn(layout, duration=1)
         elif particles.lane_basic.is_available:
-            particles.lane_basic.spawn(layout, duration=0.3)
+            particles.lane_basic.spawn(layout, duration=0.45)
     if Options.slot_effect_enabled and not is_watch():
         schedule_note_slot_effects(kind, lane, size, time())
 
